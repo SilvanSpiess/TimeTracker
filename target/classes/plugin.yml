@@ -1,0 +1,7 @@
+name: TimeTracker
+author: Sil 
+main: me.SIL.TimeTracker.TimeTracker
+description: Reminds Players, when they reach cool playtime minutes
+version: 1.0.1+mc1.20.1
+api-version: 1.19
+
