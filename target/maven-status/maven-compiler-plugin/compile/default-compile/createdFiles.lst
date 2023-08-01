@@ -1,4 +1,3 @@
 me\SIL\TimeTracker\config\TimeConfig.class
-me\SIL\TimeTracker\listener\CommandListener.class
 me\SIL\TimeTracker\TimeTracker.class
 me\SIL\TimeTracker\listener\PlayerCheck.class

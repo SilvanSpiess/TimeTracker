@@ -1,21 +1,29 @@
 package me.SIL.TimeTracker.listener;
-import me.SIL.TimeTracker.config.TimeConfig;
-
+import me.SIL.TimeTracker.TimeTracker;
 import java.util.TimerTask;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
-
+import org.bukkit.Sound;
 
 public class PlayerCheck extends TimerTask {
     private Server server;
-    private TimeConfig timeconfig;    
+    private TimeTracker plugin;
+    private Boolean isMuted;
+    private boolean isDisabled;
+    
+    public Boolean getMuted() {return isMuted;}
+    public void setMuted(Boolean newMuted) {isMuted = newMuted;}
+    public Boolean getDisabled() {return isDisabled;}
+    public void setDisabled(Boolean newDisabled) {isDisabled = newDisabled;}
 
-    public PlayerCheck(Server server, TimeConfig config) {
+    public PlayerCheck(Server server, TimeTracker timetracker) {
         this.server = server;
-        this.timeconfig = config;
+        this.plugin = timetracker;
+        isMuted = false;
+        isDisabled = false;
     }
 
     @Override
@@ -23,28 +31,31 @@ public class PlayerCheck extends TimerTask {
         server.getOnlinePlayers().forEach(o -> {
             int playticks = o.getStatistic(Statistic.TOTAL_WORLD_TIME);
             int playtime = playticks/1200;
-            //o.sendMessage("you have " + Integer.toString(playtime) + " mintues");
-            if(timeconfig.getPersonalParams().contains(playtime) && (playticks - playtime*1200) <= 200) {
-                o.sendMessage("§6§lCongratulations! §r§3§n" + o.getName() + " §r§2for playing §r§e§o" + Integer.toString(playtime) + " §r§2minutes on this Server!");
+            if(this.plugin.getTimeConfig().getPersonalParams().contains(playtime) && (playticks - playtime*1200) <= 200) {
+                if(!isDisabled) {
+                    o.sendMessage("§2Congratulations! §r§6§n" + o.getName() + "§r §2for playing §r§e§o" + Integer.toString(playtime) +
+                                  " §r§2minutes on §r§5" + this.plugin.getTimeConfig().getConfigParams().get("Server") + "!");
+                    if(!isMuted) {
+                        o.playSound(o, Sound.valueOf(this.plugin.getTimeConfig().getConfigParams().get("PersonalSound")), 
+                                       Float.valueOf(this.plugin.getTimeConfig().getConfigParams().get("PersonalVolume")),
+                                       Float.valueOf(this.plugin.getTimeConfig().getConfigParams().get("PersonalPitch")));
+                    }
+                }                
             }
-            if(timeconfig.getGlobalParams().contains(playtime) && (playticks - playtime*1200) <= 200) {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    player.sendMessage("§6§lA big applause for §r§3§n" + o.getName() + " §r§2for playing §r§e§o" + Integer.toString(playtime) + " §r§2minutes on this Server!");
+            if(this.plugin.getTimeConfig().getGlobalParams().contains(playtime) && (playticks - playtime*1200) <= 200) {
+                for (Player player : Bukkit.getOnlinePlayers()) {                    
+                    if(!isDisabled) {
+                        player.sendMessage("§2A big applause for §r§6§n" + o.getName() + "§r §2for playing §r§e§o" + 
+                                            Integer.toString(playtime) + " §r§2minutes on §r§5" + 
+                                            this.plugin.getTimeConfig().getConfigParams().get("Server") + "!");
+                        if(!isMuted) {
+                            o.playSound(o, Sound.valueOf(this.plugin.getTimeConfig().getConfigParams().get("GlobalSound")), 
+                                           Float.valueOf(this.plugin.getTimeConfig().getConfigParams().get("GlobalVolume")),
+                                           Float.valueOf(this.plugin.getTimeConfig().getConfigParams().get("GlobalPitch")));
+                        }
+                    } 
                 }
             }
-            /*
-            if(playtime == 97092) {
-                o.sendMessage("§6You have §2" + Integer.toString(playtime) + " §6mintues");                
-            }
-            else if(playtime == 97086) {
-                o.sendMessage("§6You have §2" + Integer.toString(playtime) + " §6mintues");
-            }
-            else if(playtime == 97088) {
-                o.sendMessage("§6You have §2" + Integer.toString(playtime) + " §6mintues");
-            }
-            else if(playtime == 97090) {
-                o.sendMessage("§6You have §2" + Integer.toString(playtime) + " §6mintues");
-            }*/
         });
     }
 }

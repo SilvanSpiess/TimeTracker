@@ -5,3 +5,13 @@ description: Reminds Players, when they reach cool playtime minutes
 version: 1.0.1+mc1.20.1
 api-version: 1.19
 
+permissions:
+  Staff_Member:
+    default: op
+    description: Allows moderation of the plugin
+
+commands:
+  TimeTracker:
+    description: Shows Timetracker config
+    aliases: [timetracker]
+    usage: command was malformed, please try again

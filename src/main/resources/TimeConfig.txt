@@ -1,0 +1,7 @@
+Server: Nebula
+PersonalSound: UI_TOAST_CHALLENGE_COMPLETE
+PersonalVolume: 0.5f
+PersonalPitch: 1.0f
+GlobalSound: UI_TOAST_CHALLENGE_COMPLETE
+PersonalVolume: 0.5f
+PersonalPitch: 1.0f
