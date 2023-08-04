@@ -32,10 +32,10 @@ public class PlayerCheck extends TimerTask {
             int playticks = o.getStatistic(Statistic.TOTAL_WORLD_TIME);
             int playtime = playticks/1200;
             if(this.plugin.getTimeConfig().getPersonalParams().contains(playtime) && (playticks - playtime*1200) <= 200) {
-                if(!isDisabled) {
+                if(!isDisabled && !this.plugin.getTimeConfig().getDisabledPlayers().containsValue(o.getUniqueId().toString())) {
                     o.sendMessage("§2Congratulations! §r§6§n" + o.getName() + "§r §2for playing §r§e§o" + Integer.toString(playtime) +
                                   " §r§2minutes on §r§5" + this.plugin.getTimeConfig().getConfigParams().get("Server") + "!");
-                    if(!isMuted) {
+                    if(!isMuted && !this.plugin.getTimeConfig().getMutedPlayers().containsValue(o.getUniqueId().toString())) {
                         o.playSound(o, Sound.valueOf(this.plugin.getTimeConfig().getConfigParams().get("PersonalSound")), 
                                        Float.valueOf(this.plugin.getTimeConfig().getConfigParams().get("PersonalVolume")),
                                        Float.valueOf(this.plugin.getTimeConfig().getConfigParams().get("PersonalPitch")));
@@ -44,12 +44,12 @@ public class PlayerCheck extends TimerTask {
             }
             if(this.plugin.getTimeConfig().getGlobalParams().contains(playtime) && (playticks - playtime*1200) <= 200) {
                 for (Player player : Bukkit.getOnlinePlayers()) {                    
-                    if(!isDisabled) {
+                    if(!isDisabled && !this.plugin.getTimeConfig().getDisabledPlayers().containsValue(player.getUniqueId().toString())) {
                         player.sendMessage("§2A big applause for §r§6§n" + o.getName() + "§r §2for playing §r§e§o" + 
                                             Integer.toString(playtime) + " §r§2minutes on §r§5" + 
                                             this.plugin.getTimeConfig().getConfigParams().get("Server") + "!");
-                        if(!isMuted) {
-                            o.playSound(o, Sound.valueOf(this.plugin.getTimeConfig().getConfigParams().get("GlobalSound")), 
+                        if(!isMuted && !this.plugin.getTimeConfig().getMutedPlayers().containsValue(player.getUniqueId().toString())) {
+                            player.playSound(player, Sound.valueOf(this.plugin.getTimeConfig().getConfigParams().get("GlobalSound")), 
                                            Float.valueOf(this.plugin.getTimeConfig().getConfigParams().get("GlobalVolume")),
                                            Float.valueOf(this.plugin.getTimeConfig().getConfigParams().get("GlobalPitch")));
                         }

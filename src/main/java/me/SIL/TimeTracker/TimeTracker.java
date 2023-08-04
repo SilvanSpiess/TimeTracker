@@ -17,6 +17,8 @@ public class TimeTracker extends JavaPlugin {
     private Server server;
     private Timer scheduler;
     public PlayerCheck checker;
+    public final String disabledPlayerFileName = "./plugins/TimeTracker/DisabledPlayers.txt";
+    public final String mutedPlayerFileName = "./plugins/TimeTracker/MutedPlayers.txt";
     public TimeConfig getTimeConfig() {return config;}
 
     @Override
@@ -34,7 +36,8 @@ public class TimeTracker extends JavaPlugin {
     @Override
     public void onDisable() {
         logger.info("Disabling TimeTracker Plugin");
+        getTimeConfig().storePlayers();
         if(scheduler != null)
-            scheduler.cancel();        
+            scheduler.cancel();       
     }
 }

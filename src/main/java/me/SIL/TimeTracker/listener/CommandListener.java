@@ -9,6 +9,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,6 +52,47 @@ public class CommandListener implements TabExecutor {
                             commandSender.sendMessage(ChatColor.AQUA + "Messages and sounds: " + ChatColor.GREEN + " on");
                             return true;
                         }
+                    case "disable":
+                        if (commandSender instanceof ConsoleCommandSender) {
+                            commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
+                            return true;
+                        }
+                        if (commandSender instanceof Player) {
+                            this.plugin.getTimeConfig().addUniquePlayer(this.plugin.getTimeConfig().getDisabledPlayers(), (Player) commandSender);
+                            commandSender.sendMessage(ChatColor.YELLOW + "Messages and sounds have been disabled");
+                            return true;
+                        }
+                    case "enable":
+                        if (commandSender instanceof ConsoleCommandSender) {
+                            commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
+                            return true;
+                        }
+                        if (commandSender instanceof Player) {
+                            this.plugin.getTimeConfig().removeUniquePlayer(this.plugin.getTimeConfig().getDisabledPlayers(), (Player) commandSender);
+                            commandSender.sendMessage(ChatColor.DARK_GREEN + "Messages and sounds have been enabled");
+                            return true;
+                        }
+                    case "mute":
+                        if (commandSender instanceof ConsoleCommandSender) {
+                            commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
+                            return true;
+                        }
+                        if (commandSender instanceof Player) {
+                            this.plugin.getTimeConfig().addUniquePlayer(this.plugin.getTimeConfig().getMutedPlayers(), (Player) commandSender);
+                            commandSender.sendMessage(ChatColor.YELLOW + "Sounds have been muted");
+                            return true;
+                        }
+                    case "unmute":
+                        if (commandSender instanceof ConsoleCommandSender) {
+                            commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
+                            return true;
+                        }
+                        if (commandSender instanceof Player) {
+                            this.plugin.getTimeConfig().removeUniquePlayer(this.plugin.getTimeConfig().getMutedPlayers(), (Player) commandSender);
+                            commandSender.sendMessage(ChatColor.DARK_GREEN + "Sounds have been unmuted");
+                            return true;
+                        }
+
                 }
             }
             if (args.length == 2) {
@@ -109,6 +152,16 @@ public class CommandListener implements TabExecutor {
             List<String> hints = new ArrayList<>();
             if (args.length == 0) {
                 hints.add("info");
+                if (this.plugin.getTimeConfig().getDisabledPlayers().containsValue(((Entity) commandSender).getUniqueId().toString())) {
+                    hints.add("enable");
+                } else {
+                    hints.add("disable");
+                }
+                if (this.plugin.getTimeConfig().getMutedPlayers().containsValue(((Entity) commandSender).getUniqueId().toString())) {
+                    hints.add("unmute");
+                } else {
+                    hints.add("mute");
+                }
                 if (commandSender.hasPermission("Staff_Member")) {
                     hints.add("moderate");
                 }
@@ -116,6 +169,16 @@ public class CommandListener implements TabExecutor {
             if (args.length == 1) {
                 if (args[0].length() == 0) {
                     hints.add("info");
+                    if (this.plugin.getTimeConfig().getDisabledPlayers().containsValue(((Entity) commandSender).getUniqueId().toString())) {
+                        hints.add("enable");
+                    } else {
+                        hints.add("disable");
+                    }
+                    if (this.plugin.getTimeConfig().getMutedPlayers().containsValue(((Entity) commandSender).getUniqueId().toString())) {
+                        hints.add("unmute");
+                    } else {
+                        hints.add("mute");
+                    }
                     if (commandSender.hasPermission("Staff_Member")) {
                         hints.add("moderate");
                     }
