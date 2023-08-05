@@ -14,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-
 public class CommandListener implements TabExecutor {
     private TimeTracker plugin;
 
@@ -34,24 +33,28 @@ public class CommandListener implements TabExecutor {
                         }
                         commandSender.sendMessage(ChatColor.DARK_AQUA + "Plugin to track your playtime on " + 
                                                   ChatColor.LIGHT_PURPLE + this.plugin.getTimeConfig().getConfigParams().get("Server"));
-                        commandSender.sendMessage(ChatColor.AQUA + "Personal sound: " + ChatColor.DARK_PURPLE + this.plugin.getTimeConfig().getConfigParams().get("PersonalSound") + "\n" +
-                                                  ChatColor.AQUA + "Personal volume: " + ChatColor.GREEN + this.plugin.getTimeConfig().getConfigParams().get("PersonalVolume") + 
-                                                  ChatColor.AQUA + ", Personal pitch: " + ChatColor.GREEN + this.plugin.getTimeConfig().getConfigParams().get("PersonalPitch"));
-                        commandSender.sendMessage(ChatColor.AQUA + "Global sound: " + ChatColor.DARK_PURPLE + this.plugin.getTimeConfig().getConfigParams().get("GlobalSound") + "\n" + 
-                                                  ChatColor.AQUA + "Global volume: " + ChatColor.GREEN + this.plugin.getTimeConfig().getConfigParams().get("GlobalVolume") + 
-                                                  ChatColor.AQUA + ", Global pitch: " + ChatColor.GREEN + this.plugin.getTimeConfig().getConfigParams().get("GlobalPitch"));
                         if(this.plugin.checker.getDisabled()) {
-                            commandSender.sendMessage(ChatColor.AQUA + "Messages and sounds: " + ChatColor.RED + " off");
-                            return true;
+                            commandSender.sendMessage(ChatColor.AQUA + "Serverwide messages and sounds: " + ChatColor.RED + " off");
                         }
                         else if(this.plugin.checker.getMuted()) {
-                            commandSender.sendMessage(ChatColor.AQUA + "Sounds: " + ChatColor.RED + "off");
+                            commandSender.sendMessage(ChatColor.AQUA + "Serverwide sounds are " + ChatColor.RED + "off");
+                        }
+                        else {
+                            commandSender.sendMessage(ChatColor.AQUA + "Serverwide messages and sounds are " + ChatColor.GREEN + " on");
+                        }
+                        if(this.plugin.getTimeConfig().getDisabledPlayers().containsValue(((Entity) commandSender).getUniqueId().toString())) {
+                            commandSender.sendMessage(ChatColor.AQUA + "Your messages and sounds are " + ChatColor.RED + " off");
+                            return true;
+                        }
+                        else if(this.plugin.getTimeConfig().getMutedPlayers().containsValue(((Entity) commandSender).getUniqueId().toString())) {
+                            commandSender.sendMessage(ChatColor.AQUA + "Your sounds are " + ChatColor.RED + "off");
                             return true;
                         }
                         else {
-                            commandSender.sendMessage(ChatColor.AQUA + "Messages and sounds: " + ChatColor.GREEN + " on");
+                            commandSender.sendMessage(ChatColor.AQUA + "Your messages and sounds are " + ChatColor.GREEN + " on");
                             return true;
                         }
+                        
                     case "disable":
                         if (commandSender instanceof ConsoleCommandSender) {
                             commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
@@ -99,6 +102,31 @@ public class CommandListener implements TabExecutor {
                 switch (args[0]) {
                     case "moderate":
                         switch (args[1]) {
+                            case "info":
+                                if (commandSender instanceof ConsoleCommandSender || !commandSender.hasPermission("Staff-Member")) {
+                                    commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
+                                    return true;
+                                }
+                                commandSender.sendMessage(ChatColor.DARK_AQUA + "Plugin to track your playtime on " + 
+                                                        ChatColor.LIGHT_PURPLE + this.plugin.getTimeConfig().getConfigParams().get("Server"));
+                                commandSender.sendMessage(ChatColor.AQUA + "Personal sound: " + ChatColor.DARK_PURPLE + this.plugin.getTimeConfig().getConfigParams().get("PersonalSound") + "\n" +
+                                                        ChatColor.AQUA + "Personal volume: " + ChatColor.GREEN + this.plugin.getTimeConfig().getConfigParams().get("PersonalVolume") + 
+                                                        ChatColor.AQUA + ", Personal pitch: " + ChatColor.GREEN + this.plugin.getTimeConfig().getConfigParams().get("PersonalPitch"));
+                                commandSender.sendMessage(ChatColor.AQUA + "Global sound: " + ChatColor.DARK_PURPLE + this.plugin.getTimeConfig().getConfigParams().get("GlobalSound") + "\n" + 
+                                                        ChatColor.AQUA + "Global volume: " + ChatColor.GREEN + this.plugin.getTimeConfig().getConfigParams().get("GlobalVolume") + 
+                                                        ChatColor.AQUA + ", Global pitch: " + ChatColor.GREEN + this.plugin.getTimeConfig().getConfigParams().get("GlobalPitch"));
+                                if (this.plugin.checker.getDisabled()) {
+                                    commandSender.sendMessage(ChatColor.AQUA + "Messages and sounds: " + ChatColor.RED + " off");
+                                    return true;
+                                }
+                                else if (this.plugin.checker.getMuted()) {
+                                    commandSender.sendMessage(ChatColor.AQUA + "Sounds: " + ChatColor.RED + "off");
+                                    return true;
+                                }
+                                else {
+                                    commandSender.sendMessage(ChatColor.AQUA + "Messages and sounds: " + ChatColor.GREEN + " on");
+                                    return true;
+                                }
                             case "disable":
                                 if (!commandSender.hasPermission("Staff-Member")) {
                                     commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
@@ -185,6 +213,7 @@ public class CommandListener implements TabExecutor {
                 } else {
                     if ("moderate".startsWith(args[0]) && commandSender.hasPermission("Staff_Member")) {
                         if (args[0].equals("moderate")) {
+                            hints.add("info");
                             if(this.plugin.checker.getDisabled()) 
                                 hints.add("enable");
                             else
@@ -204,6 +233,7 @@ public class CommandListener implements TabExecutor {
             if (args.length == 2) {
                 if (args[0].equals("moderate") && commandSender.hasPermission("Staff_Member")) {
                     if (args[1].length() == 0) {
+                        hints.add("info");
                         if(this.plugin.checker.getDisabled()) 
                             hints.add("enable");
                         else
@@ -214,6 +244,11 @@ public class CommandListener implements TabExecutor {
                             hints.add("mute");
                         hints.add("reload");
                     } else {
+                        if ("info".startsWith(args[1])) {
+                            if(!args[1].equals("info")) {
+                                hints.add("info");
+                            }
+                        }
                         if ("disable".startsWith(args[1]) && !this.plugin.checker.getDisabled()) {
                             if (!args[1].equals("disable")) {
                                 hints.add("disable");
