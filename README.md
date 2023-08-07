@@ -22,7 +22,6 @@ Update the Conifgfile to dynamically adjust the sound to be played, along with t
 **/timetracker info**: sends info about personal settings as well as serverwide settings to the command sender
 **/timetracker disable/enable**: disables and enables the messages sent to the player (*personal settings*)
 **/timetracker mute/unmute**: mutes/ unmutes the sound of the notifications (*personal settings*)
-
 **/timetracker moderate info**: sends more specific infos (as sound, volume and pitch) to the command sender
 **/timetracker moderate dis/enable**: dis/enables serverwide notifications (*global settings*)
 **/timetracker moderate un/mute**: un/mutes serverwide sounds (*global settings*)
