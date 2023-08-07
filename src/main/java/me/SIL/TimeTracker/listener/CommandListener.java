@@ -4,6 +4,7 @@ import me.SIL.TimeTracker.TimeTracker;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -62,7 +63,7 @@ public class CommandListener implements TabExecutor {
                         }
                         if (commandSender instanceof Player) {
                             this.plugin.getTimeConfig().addUniquePlayer(this.plugin.getTimeConfig().getDisabledPlayers(), (Player) commandSender);
-                            commandSender.sendMessage(ChatColor.YELLOW + "Messages and sounds have been disabled");
+                            commandSender.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.YELLOW + "Messages and sounds have been disabled");
                             return true;
                         }
                     case "enable":
@@ -72,7 +73,7 @@ public class CommandListener implements TabExecutor {
                         }
                         if (commandSender instanceof Player) {
                             this.plugin.getTimeConfig().removeUniquePlayer(this.plugin.getTimeConfig().getDisabledPlayers(), (Player) commandSender);
-                            commandSender.sendMessage(ChatColor.DARK_GREEN + "Messages and sounds have been enabled");
+                            commandSender.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.DARK_GREEN + "Messages and sounds have been enabled");
                             return true;
                         }
                     case "mute":
@@ -82,7 +83,7 @@ public class CommandListener implements TabExecutor {
                         }
                         if (commandSender instanceof Player) {
                             this.plugin.getTimeConfig().addUniquePlayer(this.plugin.getTimeConfig().getMutedPlayers(), (Player) commandSender);
-                            commandSender.sendMessage(ChatColor.YELLOW + "Sounds have been muted");
+                            commandSender.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.YELLOW + "Sounds have been muted");
                             return true;
                         }
                     case "unmute":
@@ -92,7 +93,7 @@ public class CommandListener implements TabExecutor {
                         }
                         if (commandSender instanceof Player) {
                             this.plugin.getTimeConfig().removeUniquePlayer(this.plugin.getTimeConfig().getMutedPlayers(), (Player) commandSender);
-                            commandSender.sendMessage(ChatColor.DARK_GREEN + "Sounds have been unmuted");
+                            commandSender.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.DARK_GREEN + "Sounds have been unmuted");
                             return true;
                         }
 
@@ -129,11 +130,13 @@ public class CommandListener implements TabExecutor {
                                 }
                             case "disable":
                                 if (!commandSender.hasPermission("Staff-Member")) {
-                                    commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
+                                    commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");                                    
                                     return true;
                                 }
                                 this.plugin.checker.setDisabled(true);
-                                commandSender.sendMessage(ChatColor.YELLOW + "Messages and sounds have been disabled");
+                                for (Player player : Bukkit.getOnlinePlayers()) {
+                                    player.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.YELLOW + "Serverwide messages and sounds have been disabled");
+                                }
                                 return true;
                             case "enable":
                                 if (!commandSender.hasPermission("Staff-Member")) {
@@ -141,7 +144,9 @@ public class CommandListener implements TabExecutor {
                                     return true;
                                 }
                                 this.plugin.checker.setDisabled(false);
-                                commandSender.sendMessage(ChatColor.DARK_GREEN + "Messages and sounds have been enabled");
+                                for (Player player : Bukkit.getOnlinePlayers()) {
+                                    player.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.DARK_GREEN + "Serverwide messages and sounds have been enabled");
+                                }
                                 return true;
                             case "mute":
                                 if (!commandSender.hasPermission("Staff-Member")) {
@@ -149,7 +154,9 @@ public class CommandListener implements TabExecutor {
                                     return true;
                                 }
                                 this.plugin.checker.setMuted(true);
-                                commandSender.sendMessage(ChatColor.YELLOW + "Sounds have been muted");
+                                for (Player player : Bukkit.getOnlinePlayers()) {
+                                    player.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.YELLOW + "Serverwide sounds have been muted");
+                                }
                                 return true;
                             case "unmute":
                                 if (!commandSender.hasPermission("Staff_Member")) {
@@ -157,7 +164,9 @@ public class CommandListener implements TabExecutor {
                                     return true;
                                 }
                                 this.plugin.checker.setMuted(false);
-                                commandSender.sendMessage(ChatColor.DARK_GREEN + "Sounds have been unmuted");
+                                for (Player player : Bukkit.getOnlinePlayers()) {
+                                    player.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.DARK_GREEN + "Serverwide sounds have been unmuted");
+                                }
                                 return true;
                             case "reload":
                                 if (!commandSender.hasPermission("Staff_Member")) {
@@ -165,7 +174,7 @@ public class CommandListener implements TabExecutor {
                                     return true;
                                 }
                                 if(this.plugin.getTimeConfig().reloadPlugin())
-                                    commandSender.sendMessage(ChatColor.DARK_GREEN + "Plugin has been reloaded");
+                                    commandSender.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.DARK_GREEN + "Plugin has been reloaded");
                                 return true;
                         }
                         break;

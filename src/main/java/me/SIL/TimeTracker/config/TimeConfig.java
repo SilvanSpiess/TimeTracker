@@ -13,18 +13,12 @@ import java.util.logging.Logger;
 import org.bukkit.entity.Player;
 
 public class TimeConfig {
-    private TimeTracker plugin;
+    //private TimeTracker plugin;
     private Logger logger;
     
-    private File PersonalFile, GlobalFile, ConfigFile;
-    private LinkedList<Integer> PersonalParams;
-    private LinkedList<Integer> GlobalParams;
-    private LinkedList<Integer> defaultPersonalParams;
-    private LinkedList<Integer> defaultGlobalParams;
-    private Map<String, String> DisabledPlayers;
-    private Map<String, String> MutedPlayers;
-    private Map<String, String> ConfigParams;
-    private Map<String, String> defaultConfigParams;
+    private File PersonalFile, GlobalFile, ConfigFile, DisabledPlayersFile, MutedPlayersFile;
+    private LinkedList<Integer> PersonalParams, GlobalParams, defaultPersonalParams, defaultGlobalParams;
+    private Map<String, String> DisabledPlayers, MutedPlayers, ConfigParams, defaultConfigParams;
 
     public LinkedList<Integer> getPersonalParams() {return PersonalParams;}
     public void setPersonalParams(LinkedList<Integer> personalParams) {this.PersonalParams = personalParams;}
@@ -131,31 +125,54 @@ public class TimeConfig {
     }
 
     private void initialisePlayers() {
-        if(new File(this.plugin.disabledPlayerFileName).exists()) {     
-            Scanner myReader;
-            myReader = new Scanner(this.plugin.disabledPlayerFileName);
-            while (myReader.hasNextLine()) {
-                String LineRead = myReader.nextLine();
-                if (LineRead.contains(": ")) {
-                    String[] ParsedLine = LineRead.split(": ");
-                    DisabledPlayers.put(ParsedLine[0], ParsedLine[1]);
-                }
-            } myReader.close();
+        if(new File("./plugins/TimeTracker/DisabledPlayers.txt").exists()) {
+            try {
+                Scanner myReader = new Scanner(DisabledPlayersFile);
+                while (myReader.hasNextLine()) {
+                    String LineRead = myReader.nextLine();
+                    if (LineRead.contains(": ")) {
+                        String[] ParsedLine = LineRead.split(": ");
+                        DisabledPlayers.put(ParsedLine[0], ParsedLine[1]);
+                    }
+                } myReader.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {            
+            try {                
+                DisabledPlayersFile.createNewFile();
+                FileWriter myWriter = new FileWriter("./plugins/TimeTracker/DisabledPlayers.txt");
+                myWriter.write("Names: UUID\n");            
+                myWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        else new File(this.plugin.disabledPlayerFileName).mkdir();
         
-        if(new File(this.plugin.mutedPlayerFileName).exists()) {
-            Scanner myReader;
-            myReader = new Scanner(this.plugin.mutedPlayerFileName);
-            while (myReader.hasNextLine()) {
-                String LineRead = myReader.nextLine();
-                if (LineRead.contains(": ")) {
-                    String[] ParsedLine = LineRead.split(": ");
-                    MutedPlayers.put(ParsedLine[0], ParsedLine[1]);
-                }
-            } myReader.close();
+        if(new File("./plugins/TimeTracker/MutedPlayers.txt").exists()) {
+            try {
+                Scanner myReader = new Scanner(MutedPlayersFile);
+                while (myReader.hasNextLine()) {
+                    String LineRead = myReader.nextLine();
+                    if (LineRead.contains(": ")) {
+                        String[] ParsedLine = LineRead.split(": ");
+                        MutedPlayers.put(ParsedLine[0], ParsedLine[1]);
+                    }
+                } myReader.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            
+        } else {
+            try {                
+                MutedPlayersFile.createNewFile();
+                FileWriter myWriter = new FileWriter("./plugins/TimeTracker/MutedPlayers.txt");
+                myWriter.write("Names: UUID\n");            
+                myWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        else new File(this.plugin.mutedPlayerFileName).mkdir();
     }
     public void addUniquePlayer(Map<String, String> players, Player p) {
         if(!players.containsValue(p.getUniqueId().toString())) {
@@ -169,10 +186,11 @@ public class TimeConfig {
     }
 
     public void storePlayers() {
-        if(new File(this.plugin.disabledPlayerFileName).exists()) {             
+        if(new File("./plugins/TimeTracker/DisabledPlayers.txt").exists()) {             
             try {
-                new FileWriter(this.plugin.disabledPlayerFileName, false).close();
-                FileWriter myWriter = new FileWriter(this.plugin.disabledPlayerFileName);
+                new FileWriter("./plugins/TimeTracker/DisabledPlayers.txt", false).close();
+                FileWriter myWriter = new FileWriter("./plugins/TimeTracker/DisabledPlayers.txt");
+                myWriter.write("Names: UUID\n");
                 for (String key : DisabledPlayers.keySet()) {
                     myWriter.write(key + ": " + DisabledPlayers.get(key) + "\n");
                 } myWriter.close();
@@ -180,12 +198,22 @@ public class TimeConfig {
                 e.printStackTrace();
             }            
         }
-        else new File(this.plugin.disabledPlayerFileName).mkdir();
+        else {            
+            try {                
+                DisabledPlayersFile.createNewFile();
+                FileWriter myWriter = new FileWriter("./plugins/TimeTracker/DisabledPlayers.txt");
+                myWriter.write("Names: UUID\n");            
+                myWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         
-        if(new File(this.plugin.mutedPlayerFileName).exists()) {             
+        if(new File("./plugins/TimeTracker/MutedPlayers.txt").exists()) {             
             try {
-                new FileWriter(this.plugin.mutedPlayerFileName, false).close();
-                FileWriter myWriter = new FileWriter(this.plugin.mutedPlayerFileName);
+                new FileWriter("./plugins/TimeTracker/MutedPlayers.txt", false).close();
+                FileWriter myWriter = new FileWriter("./plugins/TimeTracker/MutedPlayers.txt");
+                myWriter.write("Names: UUID\n");
                 for (String key : MutedPlayers.keySet()) {
                     myWriter.write(key + ": " + MutedPlayers.get(key) + "\n");
                 } myWriter.close();
@@ -193,11 +221,19 @@ public class TimeConfig {
                 e.printStackTrace();
             }            
         }
-        else new File(this.plugin.mutedPlayerFileName).mkdir();
+        else {
+            try {                
+                MutedPlayersFile.createNewFile();
+                FileWriter myWriter = new FileWriter("./plugins/TimeTracker/MutedPlayers.txt");
+                myWriter.write("Names: UUID\n");            
+                myWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void readPersonalParams() {
-        logger.info("Loading personal data from Files");
         try {
             Scanner myReader = new Scanner(PersonalFile);
             while (myReader.hasNextLine()) {
@@ -209,7 +245,6 @@ public class TimeConfig {
     }
 
     private void readGlobalParams() {
-        logger.info("Loading global data from Files");
         try {
             Scanner myReader = new Scanner(GlobalFile);
             while (myReader.hasNextLine()) {
@@ -221,7 +256,6 @@ public class TimeConfig {
     }
 
     private void readConfigParams() {
-        logger.info("Loading config data from File");
         try {
             Scanner myReader = new Scanner(ConfigFile);
             while (myReader.hasNextLine()) {
@@ -245,20 +279,23 @@ public class TimeConfig {
         DisabledPlayers.clear();
         MutedPlayers.clear();
         initialisePlayers();
+        logger.info("TimeTracker Plugin reloaded successfully");
         return true;
     }
 
     public TimeConfig(TimeTracker plugin) {
-        this.plugin = plugin;
+        //this.plugin = plugin;
         logger = plugin.getLogger();
         PersonalFile = new File("./plugins/TimeTracker/PersonalTimes.txt");
         GlobalFile = new File("./plugins/TimeTracker/GlobalTimes.txt");
-        ConfigFile = new File("./plugins/TimeTracker/TimeConfig.txt");
-        
+        ConfigFile = new File("./plugins/TimeTracker/TimeConfig.txt");        
         PersonalParams = new LinkedList<>();
         GlobalParams = new LinkedList<>();
         ConfigParams = new HashMap<>();
         loadDirectory();
+
+        DisabledPlayersFile = new File("./plugins/TimeTracker/DisabledPlayers.txt");
+        MutedPlayersFile = new File("./plugins/TimeTracker/MutedPlayers.txt");
         DisabledPlayers = new HashMap<>();  
         MutedPlayers = new HashMap<>();        
         initialisePlayers();        
@@ -267,33 +304,39 @@ public class TimeConfig {
     private void loadDirectory() {
         if (PersonalFile.exists()) {
             readPersonalParams();
+            logger.info("Personal times file loaded successfully");
         } else {
-            logger.info("Setting up directory");
+            logger.info("Setting up Personal times file");
             File f1 = new File("./plugins/TimeTracker");
             if (!(f1.exists() && f1.isDirectory()))
                 new File("./plugins/TimeTracker").mkdir();
             writeDefaultPersonalParams();
             readPersonalParams();
+            logger.info("Personal times file initialised successfully");
         }
         if (GlobalFile.exists()) {
             readGlobalParams();
+            logger.info("GLobal times file loaded successfully");
         } else {
-            logger.info("Setting up directory");
+            logger.info("Setting up Global times file");
             File f2 = new File("./plugins/TimeTracker");
             if (!(f2.exists() && f2.isDirectory()))
                 new File("./plugins/TimeTracker").mkdir();
             writeDefaultGlobalParams();
             readGlobalParams();
+            logger.info("GLobal times file initialised successfully");
         }
         if (ConfigFile.exists()) {
             readConfigParams();
+            logger.info("Config file loaded successfully");
         } else {
-            logger.info("Setting up directory");
+            logger.info("Setting up config file");
             File f2 = new File("./plugins/TimeTracker");
             if (!(f2.exists() && f2.isDirectory()))
                 new File("./plugins/TimeTracker").mkdir();
             writeDefaultConfigParams();
             readConfigParams();
+            logger.info("Config file initialised successfully");
         }
     } 
 }
