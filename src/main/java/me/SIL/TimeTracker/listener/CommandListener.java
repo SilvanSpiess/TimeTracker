@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -24,7 +25,31 @@ public class CommandListener implements TabExecutor {
     
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (label.equalsIgnoreCase("timetracker")){
+        if (label.equalsIgnoreCase("timetracker")) {
+            if (args.length == 3) {
+                if (args[0].equals("moderate") && commandSender.hasPermission("TIMETRACKER.moderate")) {
+                    if(commandSender instanceof ConsoleCommandSender) {
+                        commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
+                        return true;
+                    }
+                    else if(args[1].equals("play")) {
+                        switch (args[2]) {
+                            case "personalsound":
+                                commandSender.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.AQUA + "Playing personal sound");
+                                ((Player) commandSender).playSound((Player) commandSender, Sound.valueOf(this.plugin.getTimeConfig().getConfigParams().get("PersonalSound")), 
+                                                                                           Float.valueOf(this.plugin.getTimeConfig().getConfigParams().get("PersonalVolume")),
+                                                                                           Float.valueOf(this.plugin.getTimeConfig().getConfigParams().get("PersonalPitch")));
+                                return true;
+                            case "globalsound":
+                                commandSender.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.AQUA + "Playing global sound");
+                                ((Player) commandSender).playSound((Player) commandSender, Sound.valueOf(this.plugin.getTimeConfig().getConfigParams().get("GlobalSound")), 
+                                                                                           Float.valueOf(this.plugin.getTimeConfig().getConfigParams().get("GlobalVolume")),
+                                                                                           Float.valueOf(this.plugin.getTimeConfig().getConfigParams().get("GlobalPitch")));
+                                return true;
+                        }
+                    }                    
+                }
+            }
             if (args.length == 1) {
                 switch (args[0]) {
                     case "info":
@@ -104,7 +129,7 @@ public class CommandListener implements TabExecutor {
                     case "moderate":
                         switch (args[1]) {
                             case "info":
-                                if (commandSender instanceof ConsoleCommandSender || !commandSender.hasPermission("Staff-Member")) {
+                                if (commandSender instanceof ConsoleCommandSender || !commandSender.hasPermission("TIMETRACKER.moderate")) {
                                     commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
                                     return true;
                                 }
@@ -129,7 +154,7 @@ public class CommandListener implements TabExecutor {
                                     return true;
                                 }
                             case "disable":
-                                if (!commandSender.hasPermission("Staff-Member")) {
+                                if (!commandSender.hasPermission("TIMETRACKER.moderate")) {
                                     commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");                                    
                                     return true;
                                 }
@@ -139,7 +164,7 @@ public class CommandListener implements TabExecutor {
                                 }
                                 return true;
                             case "enable":
-                                if (!commandSender.hasPermission("Staff-Member")) {
+                                if (!commandSender.hasPermission("TIMETRACKER.moderate")) {
                                     commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
                                     return true;
                                 }
@@ -149,7 +174,7 @@ public class CommandListener implements TabExecutor {
                                 }
                                 return true;
                             case "mute":
-                                if (!commandSender.hasPermission("Staff-Member")) {
+                                if (!commandSender.hasPermission("TIMETRACKER.moderate")) {
                                     commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
                                     return true;
                                 }
@@ -159,7 +184,7 @@ public class CommandListener implements TabExecutor {
                                 }
                                 return true;
                             case "unmute":
-                                if (!commandSender.hasPermission("Staff_Member")) {
+                                if (!commandSender.hasPermission("TIMETRACKER.moderate")) {
                                     commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
                                     return true;
                                 }
@@ -168,8 +193,16 @@ public class CommandListener implements TabExecutor {
                                     player.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.DARK_GREEN + "Serverwide sounds have been unmuted");
                                 }
                                 return true;
+                            case "play":
+                                if (!commandSender.hasPermission("TIMETRACKER.moderate")) {
+                                    commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
+                                    return true;
+                                }
+                                if(this.plugin.getTimeConfig().reloadPlugin())
+                                    commandSender.sendMessage(ChatColor.LIGHT_PURPLE + "[TimeTracker] " + ChatColor.DARK_GREEN + "Plugin has been reloaded");
+                                return true;
                             case "reload":
-                                if (!commandSender.hasPermission("Staff_Member")) {
+                                if (!commandSender.hasPermission("TIMETRACKER.moderate")) {
                                     commandSender.sendMessage(ChatColor.RED + "You do not have permissions to use this command");
                                     return true;
                                 }
@@ -199,7 +232,7 @@ public class CommandListener implements TabExecutor {
                 } else {
                     hints.add("mute");
                 }
-                if (commandSender.hasPermission("Staff_Member")) {
+                if (commandSender.hasPermission("TIMETRACKER.moderate")) {
                     hints.add("moderate");
                 }
             }
@@ -216,11 +249,11 @@ public class CommandListener implements TabExecutor {
                     } else {
                         hints.add("mute");
                     }
-                    if (commandSender.hasPermission("Staff_Member")) {
+                    if (commandSender.hasPermission("TIMETRACKER.moderate")) {
                         hints.add("moderate");
                     }
                 } else {
-                    if ("moderate".startsWith(args[0]) && commandSender.hasPermission("Staff_Member")) {
+                    if ("moderate".startsWith(args[0]) && commandSender.hasPermission("TIMETRACKER.moderate")) {
                         if (args[0].equals("moderate")) {
                             hints.add("info");
                             if(this.plugin.checker.getDisabled()) 
@@ -231,6 +264,7 @@ public class CommandListener implements TabExecutor {
                                 hints.add("unmute");
                             else
                                 hints.add("mute");
+                            hints.add("play");
                             hints.add("reload");
                         } else
                             hints.add("moderate");
@@ -240,7 +274,7 @@ public class CommandListener implements TabExecutor {
                 }
             }
             if (args.length == 2) {
-                if (args[0].equals("moderate") && commandSender.hasPermission("Staff_Member")) {
+                if (args[0].equals("moderate") && commandSender.hasPermission("TIMETRACKER.moderate")) {
                     if (args[1].length() == 0) {
                         hints.add("info");
                         if(this.plugin.checker.getDisabled()) 
@@ -251,6 +285,7 @@ public class CommandListener implements TabExecutor {
                             hints.add("unmute");
                         else
                             hints.add("mute");
+                        hints.add("play");
                         hints.add("reload");
                     } else {
                         if ("info".startsWith(args[1])) {
@@ -286,8 +321,17 @@ public class CommandListener implements TabExecutor {
                     }
                 }
             }
+            if (args.length == 3) {
+                if (args[0].equals("moderate") && commandSender.hasPermission("TIMETRACKER.moderate")) {
+                    if (args[1].equals("play")) {
+                        hints.add("personalsound");
+                        hints.add("globalsound");
+                    }
+                }
+            }
             return hints;
         }
+        
         return null;
     }
 }

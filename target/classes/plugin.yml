@@ -6,7 +6,7 @@ version: 1.0.1+mc1.20.1
 api-version: 1.19
 
 permissions:
-  Staff_Member:
+  TIMETRACKER.moderate:
     default: op
     description: Allows moderation of the plugin
 
